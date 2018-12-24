@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<meta http-equiv="content-type"
+content="text/html;charset=utf-8" />
+<html>
+  <head>
+    <script src="https://www.webglearth.com/v2/api.js"></script>
+    <script>
+      function initialize() {
+        var earth = new WE.map('earth_div');
+        earth.setView([46.8011, 8.2266], 2);
+        WE.tileLayer('https://webglearth.github.io/webglearth2-offline/{z}/{x}/{y}.jpg', {
+          tileSize: 256,
+          bounds: [[-85, -180], [85, 180]],
+          minZoom: 0,
+          maxZoom: 16,
+          attribution: 'WebGLEarth example',
+          tms: true
+        }).addTo(earth);
+
+        var before = null;
+        requestAnimationFrame(function animate(now) {
+            var c = earth.getPosition();
+            var elapsed = before? now - before: 0;
+            before = now;
+            earth.setCenter([c[0], c[1] + 0.1*(elapsed/30)]);
+            requestAnimationFrame(animate);
+        });
+
+        {% for city in dict %}
+          var {{city}} = WE.marker([{{dict[city]["lat"]}},{{dict[city]["long"]}}]).addTo(earth);
+          {{city}}.bindPopup({{dict[city]["str"]|safe}}, {maxWidth: 130, closeButton: true});
+        {% endfor %}
+
+        earth.setView([47.608013, -122.335167], 1.75); <!-- set to Seattle -->
+
+      }
+    </script>
+    <style type="text/css">
+      html, body{padding: 0; margin: 0; background-color: gray; background-image: url("https://cdn.hipwallpaper.com/i/78/22/EthQwK.jpg")}
+      #earth_div{top: 0; right: 0; bottom: 0; left: 0; position: absolute !important;}
+      .title {color: white}
+      .title {font-family: "Helvetica Neue"}
+      .title {text-align: center}
+    </style>
+    <title>Top Spotify Songs Around the World</title>
+  </head>
+  <body onload="initialize()">
+    <div> <h2 class="title">   Top Spotify Songs Around the World </h2>
+    <div id="earth_div"></div>
+    </div>
+  </body>
+</html>
